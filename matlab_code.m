@@ -8,7 +8,7 @@ warning('off','all')
 %-------------------------------------------------------------
 %%
 %===========================
-1-Prepare Calibration Images
+% 1-Prepare Calibration Images
 %===========================
 path = 'Belal_checkboard/image_%03d.jpg'; % modify according to your path and images name and extension
 numImages = 20; % modify according to number of images you want to read
@@ -27,7 +27,7 @@ title('One of the Calibration Images');
 %-------------------------------------------------------------------------
 %% 
 %========================
-2-Estimate Camera Parameters
+% 2-Estimate Camera Parameters
 %========================
 % Detect the checkerboard corners in the images.
 [imagePoints, boardSize] = detectCheckerboardPoints(files);
@@ -46,8 +46,9 @@ figure('Name','Reprojection Errors','NumberTitle','off');
 showReprojectionErrors(cameraParams);
 title('Reprojection Errors');
 %-------------------------------------------------------------------------
+%%
 %========================
-%% 3-Read the Image of Objects to Be Measured
+% 3-Read the Image of Objects to Be Measured
 %========================
 imOrig = imread(files{9});
 figure('Name','Input Image','NumberTitle','off');
@@ -56,7 +57,7 @@ title('Input Image');
 %-------------------------------------------------------------------------
 %% 
 %========================
-4-Undistort the Image
+% 4-Undistort the Image
 %========================
 % Since the lens introduced little distortion, use 'full' output view to illustrate that
 % the image was undistored. If we used the default 'same' option, it would be difficult
@@ -66,9 +67,9 @@ figure('Name','Undistorted Image','NumberTitle','off');
 imshow(im, 'InitialMagnification', magnification);
 title('Undistorted Image');
 %-------------------------------------------------------------------------
-% %
+%%
 %========================
-%% 7-Compute Extrinsics
+% 7-Compute Extrinsics
 %========================
 % Detect the checkerboard.
 [imagePoints, boardSize] = detectCheckerboardPoints(im);
