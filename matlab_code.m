@@ -2,7 +2,7 @@
 % clearing, closing, and warning supression
 %===========================================
 clc
-clear all
+clearvars
 close all
 warning('off','all')
 %-------------------------------------------------------------
