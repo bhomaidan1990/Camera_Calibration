@@ -1,5 +1,5 @@
 %===========================================
-# clearing, closing, and warning supression
+% clearing, closing, and warning supression
 %===========================================
 clc
 clear all
