@@ -10,6 +10,8 @@
   - [4. Discussing the Results](#heading-4)
   - [5. Conclusion](#heading-5)
 <!-- /MarkdownTOC -->
+[Latex Document Link](https://www.overleaf.com/1773713379cgjqwyqmbmkp)
+
 ## 1. Introduction
 
 - Motivation
