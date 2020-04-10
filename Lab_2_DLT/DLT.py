@@ -91,19 +91,19 @@ def DLTcalib(nd, xyz, uv):
 
     # The parameters are in the last line of Vh and normalize them
     L = V[-1, :] / V[-1, -1]
-    print(L)
+    # print(L)
     # Camera projection matrix
     H = L.reshape(3, nd + 1)
-    print(H)
+    # print(H)
 
     # Denormalization
     # pinv: Moore-Penrose pseudo-inverse of a matrix, generalized inverse of a matrix using its SVD
     H = np.dot( np.dot( np.linalg.pinv(Tuv), H ), Txyz )
-    print(H)
+    # print(H)
     H = H / H[-1, -1]
-    print(H)
+    # print(H)
     L = H.flatten('C')
-    print('L=',L)
+    # print('L=',L)
 
     # Mean error of the DLT (mean residual of the DLT transformation in units of camera coordinates):
     uv2 = np.dot( H, np.concatenate( (xyz.T, np.ones((1, xyz.shape[0]))) ) ) 
@@ -137,11 +137,19 @@ def DLT():
         errs.append(errs_mu)
     #-------------------------------
     print('Matrix')
-    print(P)
-    Q, R = np.linalg.qr(P.reshape(3,4))
-    print('Q=',Q,'R',R)
-    print('\nError')
-    print(err)
+    #print(P)
+    P = P.reshape(3,4)
+    H1 = P[:,:3]
+    H2 = P[:,3]
+    Q, R = np.linalg.qr(H1)
+    print('Q=',Q,'\n----------\nR',R)
+    K = np.linalg.inv(R)
+    K = K / K[-1,-1]
+    Rot = np.linalg.inv(Q)
+    C = np.dot(np.linalg.inv(H1),H2)
+    t = - np.dot(Rot, C)
+    print('\n----------\nK =',K,'\n----------\nRot=',Rot,'\n----------\nt=',C)
+    print('\nError = ',err)
     #-------------------------------
     plt.figure(num='Error vs Noise')
     plt.plot(errs[0], label='Mu = 0')
