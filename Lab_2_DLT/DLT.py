@@ -135,10 +135,14 @@ def DLT():
                 err +=errs_mu[sigma-1]
             errs_mu.append(err)    
         errs.append(errs_mu)
-    # print('Matrix')
-    # print(P)
-    # print('\nError')
-    # print(err)
+    #-------------------------------
+    print('Matrix')
+    print(P)
+    Q, R = np.linalg.qr(P.reshape(3,4))
+    print('Q=',Q,'R',R)
+    print('\nError')
+    print(err)
+    #-------------------------------
     plt.figure(num='Error vs Noise')
     plt.plot(errs[0], label='Mu = 0')
     plt.plot(errs[1], label='Mu = 1')
