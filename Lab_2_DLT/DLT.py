@@ -2,8 +2,9 @@
 #------------------------------
 import numpy as np
 import matplotlib.pyplot as plt
-plt.style.use('seaborn') # pretty matplotlib plots
-plt.rcParams['figure.figsize'] = (12, 8)
+import math
+# plt.style.use('seaborn') # pretty matplotlib plots
+# plt.rcParams['figure.figsize'] = (12, 8)
 # import scikitplot as skplt 
 # import cv2 as cv
 #------------------------------
@@ -54,8 +55,10 @@ def DLTcalib(nd, xyz, uv):
         raise ValueError('%dD DLT unsupported.' %(nd))
     
     # Converting all variables to numpy array
-    xyz = np.asarray(xyz)
-    uv = np.asarray(uv)
+    if(isinstance(xyz, list)):
+        xyz = np.asarray(xyz)
+    if(isinstance(uv, list)):
+        uv = np.asarray(uv)
 
     n = xyz.shape[0]
 
@@ -113,28 +116,23 @@ def DLTcalib(nd, xyz, uv):
 
     return L, err
 
-def DLT():
-    # Known 3D coordinates
-    xyz = [[-875, 0, 9.755], [442, 0, 9.755], [1921, 0, 9.755], [2951, 0.5, 9.755], 
-    [-4132, 0.5, 23.618],[-876, 0, 23.618]]
-    # Known pixel coordinates
-    uv = [[76, 706], [702, 706], [1440, 706], [1867, 706], [264, 523], [625, 523]]
-    #------------------------------------------------------------------------------
+def DLT(P3D,P2D):
     # mu, sigma = 0, 1
     nd = 3
     errs = []
-    for mu in range(0,4): # 4
-        errs_mu = []
-        for sigma in range(0,100,1): # 30
-    # print('len__XYZ',len(xyz))
-            noise = np.random.normal(mu,sigma/10,(6,2))
-            uv_noise = uv+noise
-            #print(type(noise),noise.shape)
-            P, err = DLTcalib(nd, xyz, uv_noise)
-            if(sigma):
-                err +=errs_mu[sigma-1]
-            errs_mu.append(err)    
-        errs.append(errs_mu)
+    for sigma in range(0,100,1): # 30
+        # print('len__XYZ',len(xyz))
+        noise = np.random.normal(0,sigma/10,(6,2))
+        P2 = np.array(P2D).reshape(6,2)
+        # print(P2)
+        P3 = P2.astype(np.float)
+        uv_noise = P3 + noise
+        #print(type(noise),noise.shape)
+        P, err = DLTcalib(nd, P3D, uv_noise)
+        if(sigma):
+            err +=errs[sigma-1]
+        errs.append(err)    
+    
     #-------------------------------
     print('Matrix')
     #print(P)
@@ -151,12 +149,53 @@ def DLT():
     print('\n----------\nK =',K,'\n----------\nRot=',Rot,'\n----------\nt=',C)
     print('\nError = ',err)
     #-------------------------------
-    plt.figure(num='Error vs Noise')
-    plt.plot(errs[0], label='Mu = 0')
-    plt.plot(errs[1], label='Mu = 1')
-    plt.plot(errs[2], label='Mu = 2')
-    plt.plot(errs[3], label='Mu = 3')
-    plt.legend()
+    for i in range(len(errs)):
+        errs[i]=errs[i]/100
+    with plt.style.context('Solarize_Light2'):
+        plt.figure(num='Error vs Noise')
+        x = []
+        for i in range(len(errs)):
+            x.append(i/10.) 
+        plt.plot(x,errs, dashes=[6, 2],label='Error in pixels',color='#2ca02c')
+        plt.legend()
+        # plt.xscale('log',nonposx='clip')
+        # plt.xlim(0., 10.0)
+        plt.xlabel(r'Noise level ($\sigma$)',fontsize=14)
+        plt.ylabel('Error in pixels',fontsize=14)
+    plt.show()
+
+def plot3D(point_list):
+    from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    if(isinstance(point_list, list)):
+        point_list = np.asarray(point_list).reshape(-1,3)
+    # For each set of style and range settings, plot n random points in the box
+    # defined by x in [23, 32], y in [0, 100], z in [zlow, zhigh].
+    xs , ys, zs = point_list[0:6,0], point_list[0:6,1], point_list[0:6,2]
+    xs2 , ys2, zs2 = point_list[6:,0], point_list[6:,1], point_list[6:,2]
+    ax.scatter(xs, ys, zs, color='green', marker='o', label='3D Points')
+    ax.scatter(xs2, ys2, zs2, color='red', marker='^', label='2D Points')
+    ax.set_xlabel('X Axis')
+    ax.set_ylabel('Y Axis')
+    ax.set_zlabel('Z Axis')
+    ax.view_init(elev=20., azim=-35)
+    ax.legend()
     plt.show()
 if __name__ == "__main__":
-    DLT()
+    pass
+# Known 3D coordinates
+xyz = np.array([[-875, 0, 9.755], [442, 0, 9.755], [1921, 0, 9.755], [2951, 0.5, 9.755],
+[-4132, 0.5, 23.618],[-876, 0, 23.618]],dtype=np.float)
+# Known pixel coordinates
+uv = np.array([[76, 706], [702, 706], [1440, 706], [1867, 706], [264, 523], [625, 523]],dtype=np.float)
+uv0 = np.zeros((uv.shape[0],uv.shape[1]+1),dtype=np.float)
+uv0[:,[0,2]] = uv
+#print(uv0)
+#print(uv)
+xyzuv0 = np.zeros((12,3))
+xyzuv0[0:6,:]=xyz
+xyzuv0[6:,:] = uv0 
+#------------------------------------------------------------------------------
+DLT(xyz,uv)
+plot3D(xyzuv0)
