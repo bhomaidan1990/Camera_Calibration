@@ -1,5 +1,5 @@
 
-# Triangulation Matlab
+# Triangulation
 
 ## Intro
 
